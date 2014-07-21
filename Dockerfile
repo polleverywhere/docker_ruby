@@ -3,5 +3,5 @@ MAINTAINER Andy Shinn <andy@polleverywhere.com>
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN rbenv install 2.1.2
-RUN rbenv global 2.1.2
+RUN rbenv install 2.0.0-p481
+RUN rbenv global 2.0.0-p481
