@@ -5,8 +5,8 @@ ENV DEBIAN_FRONTEND noninteractive
 ENV HOME /root
 ENV PATH $HOME/.rbenv/shims:$PATH
 
-RUN rbenv install 2.0.0-p481
-RUN rbenv global 2.0.0-p481
+RUN rbenv install 2.1.2
+RUN rbenv global 2.1.2
 
 RUN gem install --no-ri --no-rdoc bundler
 RUN rbenv rehash
