@@ -1,8 +1,11 @@
 FROM polleverywhere/rbenv
 MAINTAINER Andy Shinn <andy@polleverywhere.com>
 
-RUN rbenv install 2.1.2
-RUN rbenv global 2.1.2
+ENV RUBY_VERSION 2.1.2
 
-RUN gem install --no-ri --no-rdoc bundler
-RUN rbenv rehash
+ADD .gemrc /root/.gemrc
+
+RUN CONFIGURE_OPTS="--disable-install-doc" rbenv install $RUBY_VERSION \
+  && rbenv global $RUBY_VERSION \
+  && gem install --no-ri --no-rdoc bundler \
+  && rbenv rehash
