@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+main() {
+  set -eo pipefail; [[ "$TRACE" ]] && set -x
+
+  local version="$1"
+  local directory="${2:-/usr/loca/rubies}"
+
+  ruby-build "$version" "$directory/$version"
+  cd "$directory/$version"
+  mkdir -p "$directory/packaged"
+  tar czf "$directory/packaged/$version.tar.gz" "."
+}
+
+main $@
