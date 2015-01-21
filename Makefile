@@ -26,7 +26,7 @@ $(BUILDS): $(BUILD_PREFIX)%:
 	docker run --name $@ $(BUILD_IMAGE) builder $* /usr/local/rubies
 	docker cp $@:/usr/local/rubies/packaged/$*.tar.gz rubies/
 	docker build -t $(MASTER_IMAGE):$* .
-	docker rm $@
+	-docker rm $@
 	rm -f rubies/$*.tar.gz
 
 remove-builder:
