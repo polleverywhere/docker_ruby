@@ -8,7 +8,8 @@ dependencies:
   override:
     - docker info
     - if [[ -e ~/docker/builder.tar ]]; then docker load --input ~/docker/builder.tar; fi
-    - make build
+    - make build:
+        timeout: 300
     - mkdir -p ~/docker; docker save ruby-builder > ~/docker/builder.tar
 
 test:
