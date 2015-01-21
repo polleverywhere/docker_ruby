@@ -4,7 +4,7 @@ endif
 
 BUILD_IMAGE  := ruby-builder
 BUILD_PREFIX := builder
-MASTER_IMAGE := quay.io/polleverywhere/ruby
+MASTER_IMAGE := polleverywhere/ruby
 BUILDS       := $(addprefix ${BUILD_PREFIX},${RUBY_VERSIONS})
 
 .PHONY: check-docker create-builder build create-builds $(BUILDS) remove-builder clean
