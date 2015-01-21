@@ -1,0 +1,25 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  cache_directories:
+    - "~/docker"
+  override:
+    - docker info
+    - if [[ -e ~/docker/builder.tar ]]; then docker load --input ~/docker/builder.tar; fi
+    - make build
+    - mkdir -p ~/docker; docker save ruby-builder > ~/docker/builder.tar
+
+test:
+  override:
+    - docker run polleverywhere/ruby:2.1.2 ruby -e 42
+    - docker run polleverywhere/ruby:2.1.5 ruby -e 42
+    - docker run polleverywhere/ruby:2.2.0 ruby -e 42
+
+deployment:
+  hub:
+    branch: master
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASSWORD
+      - docker push polleverywhere/ruby
