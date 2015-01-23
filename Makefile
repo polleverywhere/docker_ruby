@@ -2,6 +2,7 @@ ifndef RUBY_VERSIONS
 	RUBY_VERSIONS := 2.1.2 2.1.5 2.2.0
 endif
 
+CACHE_IMAGE  := ruby-cache
 BUILD_IMAGE  := ruby-builder
 BUILD_PREFIX := builder
 MASTER_IMAGE := polleverywhere/ruby
@@ -18,12 +19,20 @@ check-docker:
 create-builder: check-docker
 	docker build -t $(BUILD_IMAGE) builder
 
-build: create-builder create-builds
+create-cache: check-docker
+	docker build -t $(CACHE_IMAGE) cache
+	-docker run -d --name $(CACHE_IMAGE) $(CACHE_IMAGE)
+
+build: create-builder create-cache create-builds
 
 create-builds: $(BUILDS)
 
 $(BUILDS): $(BUILD_PREFIX)%:
-	docker run --name $@ $(BUILD_IMAGE) builder $* /usr/local/rubies
+	docker run \
+		--name $@ \
+		--volumes-from $(CACHE_IMAGE) \
+		-e RUBY_BUILD_CACHE_PATH=/tmp/rubycache \
+		$(BUILD_IMAGE) builder $* /usr/local/rubies
 	docker cp $@:/usr/local/rubies/packaged/$*.tar.gz rubies/
 	docker build -t $(MASTER_IMAGE):$* .
 	-docker rm $@
@@ -34,4 +43,5 @@ remove-builder:
 
 clean:
 	docker rm -f $(BUILDS) || true
+	docker rm -f $(CACHE_IMAGE) || true
 	rm -f rubies/*.tar.gz

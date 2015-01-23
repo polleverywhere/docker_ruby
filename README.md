@@ -23,7 +23,7 @@ CMD /my_project/bin/thin -p $PORT start
 
 ## Build
 
-We use a `Makefile` to build Ruby versions using a builder image. The builder image is based on `polleverywhere/ruby-build` and uses https://github.com/sstephenson/ruby-build to build the Ruby binaries, tar them up, and then copy them out of the image. We then add these rubies to a base `ubuntu-debootstrap` image so we don't have all the build tools left around.
+We use a `Makefile` to build Ruby versions using a builder image. We then add these rubies to a `mini/base` image so we don't have all the build tools left around.
 
 To build the images you can run:
 

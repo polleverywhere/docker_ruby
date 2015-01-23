@@ -11,6 +11,7 @@ dependencies:
     - make build:
         timeout: 300
     - mkdir -p ~/docker; docker save ruby-builder > ~/docker/builder.tar
+    - docker images
 
 test:
   override:
