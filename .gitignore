@@ -1,2 +1,3 @@
-rubies
+versions/**/*.tar.gz
+versions/**/Dockerfile
 .git

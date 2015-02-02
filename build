@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+BUILD_IMAGE="${BUILD_IMAGE:-ruby-builder}"
+CACHE_IMAGE="${CACHE_IMAGE:-ruby-cache}"
+BUILD_PREFIX="${BUILD_PREFIX:-ruby-build-}"
+VERSIONS="${VERSIONS:-versions/*}"
+
+build() {
+  declare desc="Build Ruby Docker images"
+  declare version_files="${@:-$VERSIONS}"
+  : ${version_files:?}
+
+  if [[ -z $(which docker) ]]; then
+    echo "Missing docker client which is required for building"
+    exit 2
+  fi
+
+  docker build -t "$BUILD_IMAGE" builder
+  docker build -t "$CACHE_IMAGE" cache
+  docker run -d --name "$CACHE_IMAGE" "$CACHE_IMAGE" || true
+
+  for folder in $version_files; do
+    echo $folder
+    local tags="$(cat $folder/tags)"
+    local release="$(basename $folder)"
+    local build="${BUILD_PREFIX}${release}"
+    local master="$(echo $tags | head -1)"
+
+    : ${build:?} ${tags:?} ${release:?}
+
+    docker rm "$build" || true
+    docker run \
+      -e RUBY_BUILD_CACHE_PATH=/tmp/rubycache \
+      --name "$build" \
+      "$BUILD_IMAGE" builder $release /usr/local/rubies
+    docker cp "$build":/usr/local/rubies/packaged/$release.tar.gz $folder
+    mv $folder/$release.tar.gz $folder/ruby.tar.gz
+    echo "cp template/Dockerfile $folder/Dockerfile"
+    cp template/Dockerfile $folder/Dockerfile
+    docker build -t "$master" "$folder"
+
+    for tag in $tags; do
+      docker tag -f "$master" "$tag"
+    done
+
+    docker rm "$build" || true
+    rm -f "$folder/*.tar.gz"
+  done
+}
+
+test() {
+  declare desc="Run tests against images"
+  declare version_files="${@:-$VERSIONS}"
+  local master="$(echo $PREFIXES | cut -d' ' -f1)"
+  for file in $version_files; do
+    local tag="$(head -1 $file)"
+    if $(docker inspect "$master":"$tag" >/dev/null 2>&1); then
+      docker run "$master":"$tag" apk add --update openssl || exit 1
+    fi
+  done
+}
+
+main() {
+  set -eo pipefail; [[ "$TRACE" ]] && set -x
+  cmd="$1"
+  case "$cmd" in
+    test)		shift; test $@;;
+    *)			build $@;;
+  esac
+}
+
+main "$@"
