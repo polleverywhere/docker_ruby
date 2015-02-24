@@ -1,6 +1,6 @@
 # Docker Ruby
 
-[![CircleCI](https://img.shields.io/circleci/project/polleverywhere/docker_ruby.svg)](https://circleci.com/gh/polleverywhere/docker_ruby)
+[![CircleCI](https://img.shields.io/circleci/project/polleverywhere/docker_ruby/master.svg)](https://circleci.com/gh/polleverywhere/docker_ruby)
 
 Docker images with Ruby and the `bundler` gem pre-installed. We can use this image in various Docker Ruby projects. A `Dockerfile` might look like:
 
