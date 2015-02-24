@@ -1,12 +1,11 @@
 #!/usr/bin/env bash
 
 BUILD_IMAGE="${BUILD_IMAGE:-ruby-builder}"
-CACHE_IMAGE="${CACHE_IMAGE:-ruby-cache}"
 BUILD_PREFIX="${BUILD_PREFIX:-ruby-build-}"
 VERSIONS="${VERSIONS:-versions/*}"
 
-build() {
-  declare desc="Build Ruby Docker images"
+build-ruby() {
+  declare desc="Build Ruby binary tarballs"
   declare version_files="${@:-$VERSIONS}"
   : ${version_files:?}
 
@@ -16,35 +15,42 @@ build() {
   fi
 
   docker build -t "$BUILD_IMAGE" builder
-  docker build -t "$CACHE_IMAGE" cache
-  docker run -d --name "$CACHE_IMAGE" "$CACHE_IMAGE" || true
 
   for folder in $version_files; do
-    echo $folder
     local tags="$(cat $folder/tags)"
     local release="$(basename $folder)"
     local build="${BUILD_PREFIX}${release}"
-    local master="$(echo $tags | head -1)"
 
     : ${build:?} ${tags:?} ${release:?}
 
     docker rm "$build" || true
     docker run \
-      -e RUBY_BUILD_CACHE_PATH=/tmp/rubycache \
       --name "$build" \
       "$BUILD_IMAGE" builder $release /usr/local/rubies
-    docker cp "$build":/usr/local/rubies/packaged/$release.tar.gz $folder
-    mv $folder/$release.tar.gz $folder/ruby.tar.gz
-    echo "cp template/Dockerfile $folder/Dockerfile"
+    docker cp "$build":/usr/local/rubies/packaged/$release.tar $folder
+    mv $folder/$release.tar $folder/ruby.tar
     cp template/Dockerfile $folder/Dockerfile
+
+    docker rm "$build" || true
+  done
+}
+
+build-images() {
+  declare desc="Build Ruby Docker images"
+  declare version_files="${@:-$VERSIONS}"
+  : ${version_files:?}
+
+  echo $version_files
+
+  for folder in $version_files; do
+    local tags="$(cat $folder/tags)"
+    local master="ruby-image:master"
+
     docker build -t "$master" "$folder"
 
     for tag in $tags; do
-      docker tag -f "$master" "$tag"
+      echo docker tag -f "$master" "$tag"
     done
-
-    docker rm "$build" || true
-    rm -f "$folder/*.tar.gz"
   done
 }
 
@@ -65,7 +71,8 @@ main() {
   cmd="$1"
   case "$cmd" in
     test)		shift; test $@;;
-    *)			build $@;;
+    rubies)	shift; build-ruby $@;;
+    images) shift; build-images $@;;
   esac
 }
 

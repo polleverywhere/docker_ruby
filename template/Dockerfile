@@ -1,6 +1,6 @@
 FROM gliderlabs/alpine:3.1
 
-ADD ruby.tar.gz /usr/local/
+ADD ruby.tar /usr/local/
 
 RUN apk-install \
     readline \

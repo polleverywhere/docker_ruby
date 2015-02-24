@@ -9,7 +9,7 @@ main() {
   ruby-build "$version" "$directory/$version"
   cd "$directory/$version"
   mkdir -p "$directory/packaged"
-  tar czf "$directory/packaged/$version.tar.gz" "."
+  tar cf "$directory/packaged/$version.tar" "."
 }
 
 main $@

@@ -1,3 +1,4 @@
 versions/**/*.tar.gz
+versions/**/*.tar
 versions/**/Dockerfile
 .git

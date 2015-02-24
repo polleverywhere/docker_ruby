@@ -23,6 +23,5 @@ ENV RUBY_CONFIGURE_OPTS \
   --disable-install-doc \
   --with-static-linked-ext \
   --enable-load-relative
-ENV RUBY_BUILD_CACHE_PATH /tmp/rubycache
 
-VOLUME ["/usr/local/rubies", "/tmp/rubycache"]
+VOLUME ["/usr/local/rubies"]
