@@ -1,5 +1,5 @@
 ifndef RUBY_VERSIONS
-	RUBY_VERSIONS := 2.1.2 2.1.5 2.2.0 2.2.1
+	RUBY_VERSIONS := 2.1.2 2.1.6 2.2.2
 endif
 
 BUILD_IMAGE  := ruby-builder
