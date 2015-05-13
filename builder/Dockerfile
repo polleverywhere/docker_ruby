@@ -1,4 +1,4 @@
-FROM polleverywhere/ruby-build
+FROM pepaul/ruby-build
 
 RUN apt-get -q update \
   && DEBIAN_FRONTEND=noninteractive apt-get -q -y install \
