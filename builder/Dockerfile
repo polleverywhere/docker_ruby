@@ -1,19 +1,16 @@
-FROM pepaul/ruby-build
+FROM docker-registry.ops.pe/centos:ruby-builder
 
-RUN apt-get -q update \
-  && DEBIAN_FRONTEND=noninteractive apt-get -q -y install \
+RUN yum install -y \
     autoconf \
     bison \
-    build-essential \
-    libffi-dev \
-    zlib1g-dev \
-    libssl-dev \
-    libyaml-dev \
-    libreadline6-dev \
-    libncurses5-dev \
-    libgdbm-dev \
-  && apt-get -q -y clean \
-  && rm -rf /var/lib/apt/lists
+    libffi-devel \
+    zlib-devel \
+    openssl-devel \
+    libyaml-devel \
+    readline-devel \
+    ncurses-devel \
+    gdbm-devel \
+  && yum clean all
 
 ADD builder /usr/local/bin/builder
 

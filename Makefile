@@ -4,7 +4,7 @@ endif
 
 BUILD_IMAGE  := ruby-builder
 BUILD_PREFIX := builder
-MASTER_IMAGE := polleverywhere/ruby
+MASTER_IMAGE := docker-registry.ops.pe/centos:ruby
 BUILDS       := $(addprefix ${BUILD_PREFIX},${RUBY_VERSIONS})
 
 .PHONY: check-docker create-builder build create-builds $(BUILDS) remove-builder clean
@@ -25,7 +25,7 @@ create-builds: $(BUILDS)
 $(BUILDS): $(BUILD_PREFIX)%:
 	docker run --name $@ $(BUILD_IMAGE) builder $* /usr/local/rubies
 	docker cp $@:/usr/local/rubies/packaged/$*.tar.gz rubies/
-	docker build -t $(MASTER_IMAGE):$* .
+	docker build -t $(MASTER_IMAGE)-$* .
 	-docker rm $@
 	rm -f rubies/$*.tar.gz
 
